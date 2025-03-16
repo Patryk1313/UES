@@ -7,7 +7,7 @@ function formatDate(dateStr) {
   if (isNaN(d)) return dateStr;
   const day = ('0' + d.getDate()).slice(-2);
   const month = ('0' + (d.getMonth() + 1)).slice(-2);
-  return `${day}-${month}`;
+  return `${day}.${month}`;
 }
 
 function isFutureOrToday(dateStr) {
