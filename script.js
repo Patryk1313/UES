@@ -2,20 +2,22 @@ let globalData = {};
 let fullDetails = [];
 let sortedDays = [];
 
-// 🔹 Konwersja daty do formatu "DD.MM" (do wyświetlania)
-function formatDateDisplay(dateStr) {
-  const [year, month, day] = dateStr.split('-');
-  return `${day}.${month}`;
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const day = ('0' + d.getDate()).slice(-2);
+  const month = ('0' + (d.getMonth() + 1)).slice(-2);
+  return `${day}-${month}`;
 }
 
-// 🔹 Sprawdzanie, czy data jest dzisiejsza lub przyszła (działa na "YYYY-MM-DD")
 function isFutureOrToday(dateStr) {
+  const [day, month] = dateStr.split('-').map(Number);
   const today = new Date();
-  const inputDate = new Date(dateStr);
-  return inputDate >= today;
+  const inputDate = new Date(today.getFullYear(), month - 1, day);
+  const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return inputDate >= now;
 }
 
-// 🔹 Renderowanie tabeli z poprawnym kolorowaniem komórek
 function renderTable(limit = 3) {
   let days = [...sortedDays];
   if (limit !== 'all') days = days.slice(0, limit);
@@ -23,26 +25,27 @@ function renderTable(limit = 3) {
   let dayTotals = {};
   days.forEach(day => dayTotals[day] = 0);
 
-  let html = '<table><thead><tr><th>Przedmiot</th>';
-  days.forEach(day => html += `<th>${formatDateDisplay(day)}</th>`);
+  let html = '<table><thead><tr><th class="subject-column">Przedmiot</th>';
+  days.forEach(day => html += `<th class="date-column">${day}</th>`);
   html += '</tr></thead><tbody>';
 
   for (let subj in globalData) {
-    html += `<tr><td>${subj}</td>`;
+    html += `<tr><td class="subject-column">${subj}</td>`;
     days.forEach(day => {
       const count = globalData[subj][day] || 0;
       dayTotals[day] += count;
-
-      // 🔹 Poprawione kolorowanie komórek
       let colorClass = '';
-      if (count === 1) colorClass = 'green';
+      if (count < 1) colorClass = 'white';
+      else if (count === 1) colorClass = 'green';
       else if (count === 2) colorClass = 'orange';
       else if (count >= 3) colorClass = 'red';
 
       const isExam = fullDetails.some(row => row['przedmiot'] === subj && row['dzień'] === day && row['typ'] === 'EGZ');
       const extraClass = isExam ? 'blink-red' : '';
 
-      html += `<td class="${colorClass} ${extraClass}" onclick="showDetails('${subj}', '${day}')">${count}</td>`;
+      html += count > 0
+        ? `<td class="${colorClass} ${extraClass}" onclick="showDetails('${subj}', '${day}')">${count}</td>`
+        : `<td class="${colorClass}">${count}</td>`;
     });
     html += '</tr>';
   }
@@ -50,23 +53,40 @@ function renderTable(limit = 3) {
   html += '<tr><th>Razem</th>';
   days.forEach(day => {
     const total = dayTotals[day];
-    let totalColorClass = total < 2 ? 'green' : total <= 4 ? 'orange' : 'red';
+    let totalColorClass = '';
+    if (total < 2) totalColorClass = 'green';
+    else if (total >= 2 && total <= 4) totalColorClass = 'orange';
+    else if (total > 4) totalColorClass = 'red';
 
     html += `<th class="${totalColorClass}" onclick="showDayDetails('${day}')" style="cursor:pointer;">${total}</th>`;
   });
-  html += '</tr></tbody></table>';
-  
+  html += '</tr>';
+
+  html += '</tbody></table>';
   document.getElementById('output').innerHTML = html;
 }
 
-// 🔹 Wyświetlanie szczegółów zajęć
 function showDetails(subject, day) {
+  // Zapisujemy wybrany przedmiot i dzień w localStorage
+  localStorage.setItem('selectedSubject', subject);
+  localStorage.setItem('selectedDay', day);
+
+  // Pobieramy szczegóły zajęć dla danego przedmiotu i dnia
   const filtered = fullDetails.filter(row => row['przedmiot'] === subject && row['dzień'] === day);
+  localStorage.setItem('details', JSON.stringify(filtered));
+
+  // Przechodzimy na stronę szczegółów
+  window.location.href = 'details.html';
+}
+
+
+
+function showDayDetails(day) {
+  const filtered = fullDetails.filter(row => row['dzień'] === day);
   localStorage.setItem('details', JSON.stringify(filtered));
   window.location.href = 'details.html';
 }
 
-// 🔹 Przetwarzanie pliku Excel i konwersja na JSON
 function processExcel(json) {
   globalData = {};
   let daySet = new Set();
@@ -75,14 +95,7 @@ function processExcel(json) {
     const subject = row['przedmiot'];
     let day = row['dzień'];
     if (!subject || !day) return;
-
-    // 🔹 Konwersja "DD.MM" → "YYYY-MM-DD"
-    if (day.includes('.')) {
-      const [d, m] = day.split('.').map(Number);
-      const year = new Date().getFullYear();
-      day = `${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    }
-
+    day = formatDate(day);
     if (!isFutureOrToday(day)) return;
     if (!globalData[subject]) globalData[subject] = {};
     if (!globalData[subject][day]) globalData[subject][day] = 0;
@@ -91,19 +104,20 @@ function processExcel(json) {
     row['dzień'] = day;
   });
 
-  // 🔹 Sortowanie dat
-  sortedDays = Array.from(daySet).sort((a, b) => new Date(a) - new Date(b));
+  sortedDays = Array.from(daySet).sort((a, b) => {
+    const [ad, am] = a.split('-').map(Number);
+    const [bd, bm] = b.split('-').map(Number);
+    return new Date(0, am - 1, ad) - new Date(0, bm - 1, bd);
+  });
 
   renderTable();
 }
 
-// 🔹 Czyszczenie danych z localStorage
 function clearData() {
   localStorage.removeItem('excelData');
   location.reload();
 }
 
-// 🔹 Obsługa wgrywania pliku Excel
 const fileInput = document.getElementById('fileInput');
 fileInput.addEventListener('change', e => {
   const reader = new FileReader();
@@ -115,11 +129,10 @@ fileInput.addEventListener('change', e => {
     fullDetails = json;
     localStorage.setItem('excelData', JSON.stringify(json));
     processExcel(json);
-  };
+  }; 
   reader.readAsArrayBuffer(e.target.files[0]);
 });
 
-// 🔹 Wczytywanie zapisanych danych przy starcie strony
 window.onload = () => {
   const saved = localStorage.getItem('excelData');
   if (saved) {
@@ -129,14 +142,13 @@ window.onload = () => {
   }
 };
 
-// 🔹 Obsługa wyboru liczby dni w ustawieniach
 const daysSelect = document.getElementById('daysSelect');
 daysSelect.addEventListener('change', function() {
   const value = this.value === 'all' ? 'all' : parseInt(this.value);
   renderTable(value);
 });
 
-// 🔹 Obsługa okna modalnego
+// Modal settings
 const modal = document.getElementById("settingsModal");
 const btn = document.getElementById("settingsBtn");
 const span = document.getElementsByClassName("close")[0];
