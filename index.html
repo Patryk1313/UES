@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UE - Schedule</title>
+  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Informatyka I semestr</h1>
+
+<button id="settingsBtn">⚙️ Settings</button>
+
+<div id="output"></div>
+
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <label for="daysSelect">Pokaż najbliższe dni:</label>
+    <select id="daysSelect">
+      <option value="3">3 dni</option>
+      <option value="5">5 dni</option>
+      <option value="10">10 dni</option>
+      <option value="all">Wszystkie</option>
+    </select>
+
+    <span class="close">&times;</span>
+    <h2>Ustawienia</h2>
+    <label for="fileInput">Wgraj plik Excel:</label>
+    <input type="file" id="fileInput" />
+    <br /><br />
+    <button onclick="clearData()">🗑️ Usuń dane</button>
+  </div>
+</div>
+
+<script src="/script.js"></script>
+
+</body>
+</html>
