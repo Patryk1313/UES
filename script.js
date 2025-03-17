@@ -18,6 +18,7 @@ function isFutureOrToday(dateStr) {
   return inputDate >= now;
 }
 
+// Modyfikacja renderTable aby dodac klasy do liczb zamiast tła
 function renderTable(limit = 3) {
   let days = [...sortedDays];
   if (limit !== 'all') days = days.slice(0, limit);
@@ -25,46 +26,51 @@ function renderTable(limit = 3) {
   let dayTotals = {};
   days.forEach(day => dayTotals[day] = 0);
 
-  let html = '<table><thead><tr><th class="subject-column">Przedmiot</th>';
-  days.forEach(day => html += `<th class="date-column">${day}</th>`);
+  let html = '<table><thead><tr><th>Przedmiot</th>';
+  days.forEach(day => html += `<th>${day}</th>`);
   html += '</tr></thead><tbody>';
 
   for (let subj in globalData) {
-    html += `<tr><td class="subject-column">${subj}</td>`;
+    html += `<tr><td class="subject-cell">${subj}</td>`;
     days.forEach(day => {
       const count = globalData[subj][day] || 0;
       dayTotals[day] += count;
-      let colorClass = '';
-      if (count < 1) colorClass = 'white';
-      else if (count === 1) colorClass = 'green';
-      else if (count === 2) colorClass = 'orange';
-      else if (count >= 3) colorClass = 'red';
-
+      let numberClass = '';
+      if (count === 0) numberClass = 'zero-number';
+      else if (count < 2) numberClass = 'green-number';
+      else if (count >= 2 && count <= 4) numberClass = 'orange-number';
+      else numberClass = 'red-number';
+  
       const isExam = fullDetails.some(row => row['przedmiot'] === subj && row['dzień'] === day && row['typ'] === 'EGZ');
       const extraClass = isExam ? 'blink-red' : '';
-
-      html += count > 0
-        ? `<td class="${colorClass} ${extraClass}" onclick="showDetails('${subj}', '${day}')">${count}</td>`
-        : `<td class="${colorClass}">${count}</td>`;
+  
+      html += `<td onclick="showDetails('${subj}', '${day}')">
+                 <span class="${numberClass} ${extraClass}">${count}</span>
+               </td>`;
     });
     html += '</tr>';
   }
-
+  
+  // Wiersz „Razem”
   html += '<tr><th>Razem</th>';
   days.forEach(day => {
-    const total = dayTotals[day];
-    let totalColorClass = '';
-    if (total < 2) totalColorClass = 'green';
-    else if (total >= 2 && total <= 4) totalColorClass = 'orange';
-    else if (total > 4) totalColorClass = 'red';
-
-    html += `<th class="${totalColorClass}" onclick="showDayDetails('${day}')" style="cursor:pointer;">${total}</th>`;
+    let total = dayTotals[day];
+    let totalClass = '';
+    if (total === 0) totalClass = 'zero-number';
+    else if (total < 2) totalClass = 'green-number';
+    else if (total >= 2 && total <= 4) totalClass = 'orange-number';
+    else totalClass = 'red-number';
+  
+    html += `<th onclick="showDayDetails('${day}')">
+               <span class="${totalClass}">${total}</span>
+             </th>`;
   });
   html += '</tr>';
 
   html += '</tbody></table>';
   document.getElementById('output').innerHTML = html;
 }
+
 
 function showDetails(subject, day) {
   // Zapisujemy wybrany przedmiot i dzień w localStorage
@@ -78,8 +84,6 @@ function showDetails(subject, day) {
   // Przechodzimy na stronę szczegółów
   window.location.href = 'details.html';
 }
-
-
 
 function showDayDetails(day) {
   const filtered = fullDetails.filter(row => row['dzień'] === day);

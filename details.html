@@ -4,54 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Szczegóły Zajęć</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; background: white; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #004678; color: white; }
-    a { display: block; margin: 10px 0; }
-    /* Styl dla migającego wiersza */
-    @keyframes blink {
-      50% { background-color: rgba(255, 0, 0, 0.5); }
-    }
-    .blink {
-      animation: blink 1s infinite;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>Szczegóły Zajęć</h1>
-<a href="index.html">← Powrót</a>
-<div id="details"></div>
+<a href="index.html" class="back-button">Powrót</a>
+
+<div id="details" class="table-container"></div>
 
 <script>
   const data = JSON.parse(localStorage.getItem('details') || '[]');
   if (data.length === 0) {
     document.getElementById('details').innerHTML = '<p>Brak danych.</p>';
   } else {
-    // Lista kolumn do pominięcia
-    const excludeColumns = ['rok akademicki', 'tryb', 'stopień', 'dzień', 'kod przedmiotu'];
-    
-    let html = '<table><thead><tr>';
-    // Generowanie nagłówków tabeli z pominięciem wybranych kolumn
-    Object.keys(data[0]).forEach(key => {
-      if (!excludeColumns.includes(key.toLowerCase())) {
-        html += `<th>${key}</th>`;
-      }
+    let html = '<table class="styled-table"><thead><tr>';
+    const columns = ['blok', 'typ', 'przedmiot', 'sala', 'prowadzący'];
+
+    columns.forEach(col => {
+      html += `<th>${col.charAt(0).toUpperCase() + col.slice(1)}</th>`;
     });
+
     html += '</tr></thead><tbody>';
-    // Generowanie wierszy tabeli z pominięciem wybranych kolumn
+
     data.forEach(row => {
-      const isEgz = row['typ'] && row['typ'].toUpperCase() === 'EGZ';
-      html += `<tr class="${isEgz ? 'blink' : ''}">`;
-      Object.entries(row).forEach(([key, val]) => {
-        if (!excludeColumns.includes(key.toLowerCase())) {
-          html += `<td>${val}</td>`;
-        }
+      html += `<tr>`;
+      columns.forEach(col => {
+        html += `<td>${row[col] || ''}</td>`;
       });
       html += '</tr>';
     });
+
     html += '</tbody></table>';
     document.getElementById('details').innerHTML = html;
   }

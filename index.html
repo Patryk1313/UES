@@ -14,7 +14,7 @@
 
 <h1>Informatyka I semestr</h1>
 
-<button id="settingsBtn">⚙️ Ustawienia</button>
+<button id="settingsBtn">⚙️</button>
 
 <div id="output"></div>
 
@@ -22,26 +22,32 @@
   <div class="modal-content">
 
     <span class="close">&times;</span>
-      <h2>Ustawienia</h2>
-      <br /><br /><br /><br />
-      <label for="fileInput">Wgraj plik Excel:</label>
-      <br /><br />
-      <input type="file" id="fileInput" />
-      <br /><br />
-      <button onclick="clearData()">🗑️ Usuń dane</button>
-      <br /><br /><br /><br />
-
-    <label for="daysSelect">Pokaż najbliższe dni:</label>
+    <h2>Ustawienia</h2>
+    <br />
+    
+    <label for="fileInput">Wgraj plik Excel z planem zajęć:</label>
     <br /><br />
-    <select id="daysSelect">
+    
+    <label class="custom-file-upload">
+      <input type="file" id="fileInput" />
+      📂 Wybierz plik
+    </label>
+    <span id="file-name">Nie wybrano pliku</span>
+    
+    <br /><br />
+    
+    <button class="delete-btn" onclick="clearData()">🗑️ Usuń dane</button>
+    
+    <br /><br />
+    
+    <label for="daysSelect">Pokaż najbliższe dni:</label>
+    <select id="daysSelect" class="select-custom">
       <option value="3">3 dni</option>
       <option value="5">5 dni</option>
       <option value="10">10 dni</option>
       <option value="all">Wszystkie</option>
     </select>
-
-    
-  </div>
+  </div>    
 </div>
 
 <script src="script.js"></script>
