@@ -388,8 +388,8 @@ span {
 /* Ograniczenie szerokości kolumny 'blok' */
 .styled-table th:first-child, 
 .styled-table td:first-child {
-  width: 20px;
-  max-width: 20px;
+  width: 30px;
+  max-width: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -400,8 +400,8 @@ span {
 .styled-table th:nth-child(2), 
 .styled-table td:nth-child(2) {
   text-align: center;
-  width: 10px;
-  max-width: 10px;
+  width: 14px;
+  max-width: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
