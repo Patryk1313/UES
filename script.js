@@ -1,21 +1,17 @@
-// script.js
-
 let globalData = {};
 let fullDetails = [];
 let sortedDays = [];
 
 function formatDate(dateStr) {
   if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    // Jeśli mamy pełną datę jako string np. 2025-04-01
     const parts = dateStr.split('-');
     return `${parts[2]}.${parts[1]}`; // 01.04
   } else if (dateStr instanceof Date) {
-    // Jeśli Excel zwróci datę jako obiekt Date
     const day = ('0' + dateStr.getDate()).slice(-2);
     const month = ('0' + (dateStr.getMonth() + 1)).slice(-2);
     return `${day}.${month}`;
   } else {
-    return dateStr; // W razie innego formatu zwracamy oryginał
+    return dateStr;
   }
 }
 
@@ -27,7 +23,7 @@ function isFutureOrToday(dateStr) {
   return inputDate >= now;
 }
 
-function renderTable(limit = 3) {
+function renderTable(limit = 3, dayHours = {}) {
   let days = [...sortedDays];
   if (limit !== 'all') days = days.slice(0, limit);
 
@@ -59,6 +55,7 @@ function renderTable(limit = 3) {
     html += '</tr>';
   }
 
+  // Podsumowanie Razem
   html += '<tr><th>Razem</th>';
   days.forEach(day => {
     let total = dayTotals[day];
@@ -71,6 +68,14 @@ function renderTable(limit = 3) {
     html += `<th onclick="showDayDetails('${day}')">
       <span class="${totalClass}">${total}</span>
     </th>`;
+  });
+  html += '</tr>';
+
+  // Dodanie godzin rozpoczęcia i zakończenia
+  html += '<tr><th>Godziny</th>';
+  days.forEach(day => {
+    const godziny = dayHours[day] ? `${dayHours[day].start} - ${dayHours[day].end}` : '';
+    html += `<th style="font-size: 12px; line-height: 1.4;">${godziny}</th>`;
   });
   html += '</tr>';
 
@@ -93,20 +98,34 @@ function showDayDetails(day) {
 function processExcel(json) {
   globalData = {};
   let daySet = new Set();
+  let dayHours = {}; // Zbieramy godziny rozpoczęcia i zakończenia
 
   json.forEach(row => {
     const subject = row['przedmiot'];
     let day = row['dzień'];
     if (!subject || !day) return;
     
-    day = formatDate(day); // FORMATOWANIE!
+    day = formatDate(day);
     
     if (!isFutureOrToday(day)) return;
     if (!globalData[subject]) globalData[subject] = {};
     if (!globalData[subject][day]) globalData[subject][day] = 0;
     globalData[subject][day] += 1;
     daySet.add(day);
-    row['dzień'] = day; // ZAPISUJEMY już sformatowaną datę
+    row['dzień'] = day;
+
+    // Godziny
+    if (row['blok']) {
+      const blok = row['blok'];
+      const [start, end] = blok.split('-').map(t => t.trim());
+      
+      if (!dayHours[day]) {
+        dayHours[day] = { start, end };
+      } else {
+        if (start < dayHours[day].start) dayHours[day].start = start;
+        if (end > dayHours[day].end) dayHours[day].end = end;
+      }
+    }
   });
 
   sortedDays = Array.from(daySet).sort((a,b)=>{
@@ -115,7 +134,7 @@ function processExcel(json) {
     return new Date(0, am-1, ad) - new Date(0, bm-1, bd);
   });
 
-  renderTable();
+  renderTable(3, dayHours);
 }
 
 function clearData() {
@@ -150,7 +169,7 @@ window.onload = () => {
 const daysSelect = document.getElementById('daysSelect');
 daysSelect.addEventListener('change', function() {
   const value = this.value === 'all' ? 'all' : parseInt(this.value);
-  renderTable(value);
+  processExcel(fullDetails, value);
 });
 
 // Modal settings
@@ -176,7 +195,6 @@ themeToggle.addEventListener('change', () => {
     localStorage.setItem('theme', 'dark');
   }
 });
-
 
 btn.onclick = () => modal.style.display = "block";
 span.onclick = () => modal.style.display = "none";
