@@ -386,10 +386,16 @@ span {
 /* ===================== RESPONSYWNOŚĆ ====================== */
 
 /* Ograniczenie szerokości kolumny 'blok' */
+
+.styled-table th, 
+.styled-table td {
+  font-size: 10px;
+}
+
 .styled-table th:first-child, 
 .styled-table td:first-child {
-  width: 30px;
-  max-width: 30px;
+  width: 60px;
+  max-width: 60px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -400,9 +406,10 @@ span {
 .styled-table th:nth-child(2), 
 .styled-table td:nth-child(2) {
   text-align: center;
-  width: 14px;
-  max-width: 14px;
+  width: 30px;
+  max-width: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
