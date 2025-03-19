@@ -1,24 +1,32 @@
+// script.js
+
 let globalData = {};
 let fullDetails = [];
 let sortedDays = [];
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const day = ('0' + d.getDate()).slice(-2);
-  const month = ('0' + (d.getMonth() + 1)).slice(-2);
-  return `${day}-${month}`;
+  if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    // Jeśli mamy pełną datę jako string np. 2025-04-01
+    const parts = dateStr.split('-');
+    return `${parts[2]}.${parts[1]}`; // 01.04
+  } else if (dateStr instanceof Date) {
+    // Jeśli Excel zwróci datę jako obiekt Date
+    const day = ('0' + dateStr.getDate()).slice(-2);
+    const month = ('0' + (dateStr.getMonth() + 1)).slice(-2);
+    return `${day}.${month}`;
+  } else {
+    return dateStr; // W razie innego formatu zwracamy oryginał
+  }
 }
 
 function isFutureOrToday(dateStr) {
-  const [day, month] = dateStr.split('-').map(Number);
+  const [day, month] = dateStr.split(/[-.]/).map(Number);
   const today = new Date();
   const inputDate = new Date(today.getFullYear(), month - 1, day);
   const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return inputDate >= now;
 }
 
-// Modyfikacja renderTable aby dodac klasy do liczb zamiast tła
 function renderTable(limit = 3) {
   let days = [...sortedDays];
   if (limit !== 'all') days = days.slice(0, limit);
@@ -40,18 +48,17 @@ function renderTable(limit = 3) {
       else if (count < 2) numberClass = 'green-number';
       else if (count >= 2 && count <= 4) numberClass = 'orange-number';
       else numberClass = 'red-number';
-  
+
       const isExam = fullDetails.some(row => row['przedmiot'] === subj && row['dzień'] === day && row['typ'] === 'EGZ');
       const extraClass = isExam ? 'blink-red' : '';
-  
+
       html += `<td onclick="showDetails('${subj}', '${day}')">
-                 <span class="${numberClass} ${extraClass}">${count}</span>
-               </td>`;
+        <span class="${numberClass} ${extraClass}">${count}</span>
+      </td>`;
     });
     html += '</tr>';
   }
-  
-  // Wiersz „Razem”
+
   html += '<tr><th>Razem</th>';
   days.forEach(day => {
     let total = dayTotals[day];
@@ -60,10 +67,10 @@ function renderTable(limit = 3) {
     else if (total < 2) totalClass = 'green-number';
     else if (total >= 2 && total <= 4) totalClass = 'orange-number';
     else totalClass = 'red-number';
-  
+
     html += `<th onclick="showDayDetails('${day}')">
-               <span class="${totalClass}">${total}</span>
-             </th>`;
+      <span class="${totalClass}">${total}</span>
+    </th>`;
   });
   html += '</tr>';
 
@@ -71,17 +78,9 @@ function renderTable(limit = 3) {
   document.getElementById('output').innerHTML = html;
 }
 
-
 function showDetails(subject, day) {
-  // Zapisujemy wybrany przedmiot i dzień w localStorage
-  localStorage.setItem('selectedSubject', subject);
-  localStorage.setItem('selectedDay', day);
-
-  // Pobieramy szczegóły zajęć dla danego przedmiotu i dnia
   const filtered = fullDetails.filter(row => row['przedmiot'] === subject && row['dzień'] === day);
   localStorage.setItem('details', JSON.stringify(filtered));
-
-  // Przechodzimy na stronę szczegółów
   window.location.href = 'details.html';
 }
 
@@ -99,19 +98,21 @@ function processExcel(json) {
     const subject = row['przedmiot'];
     let day = row['dzień'];
     if (!subject || !day) return;
-    day = formatDate(day);
+    
+    day = formatDate(day); // FORMATOWANIE!
+    
     if (!isFutureOrToday(day)) return;
     if (!globalData[subject]) globalData[subject] = {};
     if (!globalData[subject][day]) globalData[subject][day] = 0;
     globalData[subject][day] += 1;
     daySet.add(day);
-    row['dzień'] = day;
+    row['dzień'] = day; // ZAPISUJEMY już sformatowaną datę
   });
 
-  sortedDays = Array.from(daySet).sort((a, b) => {
-    const [ad, am] = a.split('-').map(Number);
-    const [bd, bm] = b.split('-').map(Number);
-    return new Date(0, am - 1, ad) - new Date(0, bm - 1, bd);
+  sortedDays = Array.from(daySet).sort((a,b)=>{
+    const [ad, am] = a.split(/[-.]/).map(Number);
+    const [bd, bm] = b.split(/[-.]/).map(Number);
+    return new Date(0, am-1, ad) - new Date(0, bm-1, bd);
   });
 
   renderTable();
@@ -133,7 +134,7 @@ fileInput.addEventListener('change', e => {
     fullDetails = json;
     localStorage.setItem('excelData', JSON.stringify(json));
     processExcel(json);
-  }; 
+  };
   reader.readAsArrayBuffer(e.target.files[0]);
 });
 
@@ -157,6 +158,26 @@ const modal = document.getElementById("settingsModal");
 const btn = document.getElementById("settingsBtn");
 const span = document.getElementsByClassName("close")[0];
 
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const currentTheme = localStorage.getItem('theme') || 'dark';
+
+document.body.classList.add(`${currentTheme}-theme`);
+if (currentTheme === 'light') themeToggle.checked = true;
+
+themeToggle.addEventListener('change', () => {
+  if (themeToggle.checked) {
+    document.body.classList.remove('dark-theme');
+    document.body.classList.add('light-theme');
+    localStorage.setItem('theme', 'light');
+  } else {
+    document.body.classList.remove('light-theme');
+    document.body.classList.add('dark-theme');
+    localStorage.setItem('theme', 'dark');
+  }
+});
+
+
 btn.onclick = () => modal.style.display = "block";
 span.onclick = () => modal.style.display = "none";
-window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; };
+window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; }

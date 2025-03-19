@@ -1,43 +1,121 @@
-/* style.css */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+/* ======= ZMIENNE ======= */
+:root {
+  /* DARK MODE COLORS */
+  --dark-bg: #2c2b32;
+  --dark-text: #e0e0e0;
+  --dark-th-bg: #2c2b32;
+  --dark-th-text: #a5a5a5;
+  --dark-td-border: #3e3c47;
+  --dark-table-bg: #312f38;
+  --dark-primary-btn: #2c2c34;
+  --dark-hover-btn: #3b3b47;
+  --dark-modal-bg: #2c2b32;
+  --dark-modal-border: #888;
+  --dark-green-number: #81c784;
+  --dark-orange-number: #ffb74d;
+  --dark-red-number: #e57373;
+  --dark-zero-number: #999999;
+  --dark-egz-color: #ff4c4c;
+  --dark-heading-color: #ffffff;
+
+  /* LIGHT MODE COLORS */
+  --light-bg: #f8f9fa;
+  --light-text: #212529;
+  --light-th-bg: #343a40;
+  --light-th-text: #ffffff;
+  --light-td-border: #dee2e6;
+  --light-table-bg: #ffffff;
+  --light-primary-btn: #e0e0e0;
+  --light-hover-btn: #d0d0d0;
+  --light-modal-bg: #ffffff;
+  --light-modal-border: #dee2e6;
+  --light-green-number: #28a745;
+  --light-orange-number: #ffc107;
+  --light-red-number: #dc3545;
+  --light-zero-number: #6c757d;
+  --light-egz-color: #dc3545;
+  --light-heading-color: #111;
+}
+
+/* ===================== DARK THEME ====================== */
+body.dark-theme {
+  --bg-color: var(--dark-bg);
+  --text-color: var(--dark-text);
+  --table-bg: var(--dark-table-bg);
+  --th-bg: var(--dark-th-bg);
+  --th-text: var(--dark-th-text);
+  --td-border: var(--dark-td-border);
+  --primary-btn: var(--dark-primary-btn);
+  --hover-btn: var(--dark-hover-btn);
+  --modal-bg: var(--dark-modal-bg);
+  --modal-border: var(--dark-modal-border);
+  --green-number: var(--dark-green-number);
+  --orange-number: var(--dark-orange-number);
+  --red-number: var(--dark-red-number);
+  --zero-number: var(--dark-zero-number);
+  --egz-color: var(--dark-egz-color);
+  --heading-color: var(--dark-heading-color);
+}
+
+/* ===================== LIGHT THEME ====================== */
+body.light-theme {
+  --bg-color: var(--light-bg);
+  --text-color: var(--light-text);
+  --table-bg: var(--light-table-bg);
+  --th-bg: var(--light-th-bg);
+  --th-text: var(--light-th-text);
+  --td-border: var(--light-td-border);
+  --primary-btn: var(--light-primary-btn);
+  --hover-btn: var(--light-hover-btn);
+  --modal-bg: var(--light-modal-bg);
+  --modal-border: var(--light-modal-border);
+  --green-number: var(--light-green-number);
+  --orange-number: var(--light-orange-number);
+  --red-number: var(--light-red-number);
+  --zero-number: var(--light-zero-number);
+  --egz-color: var(--light-egz-color);
+  --heading-color: var(--light-heading-color);
+}
+
+/* ===================== GLOBAL ====================== */
 body {
   font-family: "Poppins", sans-serif;
   margin: 20px;
-  background-color: #2c2b32;
-  color: #e0e0e0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 h1 {
   text-align: center;
-  color: #ffffff;
+  color: var(--heading-color);
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
   margin-top: 20px;
-  background: #312f38;
+  background: var(--table-bg);
   table-layout: fixed;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 th, td {
-  border: 1px solid #3e3c47;
+  border: 1px solid var(--td-border);
   padding: 10px 5px;
   text-align: center;
-  cursor: pointer;
   word-wrap: break-word;
   font-size: 14px;
-  color: #bdbdbd;
+  color: var(--text-color);
 }
 
 th {
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 1px;
-  background-color: #2c2b32;
-  color: #a5a5a5;
+  background-color: var(--th-bg);
+  color: var(--th-text);
 }
 
 th:first-child, td:first-child {
@@ -48,7 +126,6 @@ th:first-child, td:first-child {
   text-overflow: ellipsis;
   text-align: left;
   font-weight: 600;
-  color: #ffffff;
 }
 
 th:not(:first-child), td:not(:first-child) {
@@ -56,23 +133,32 @@ th:not(:first-child), td:not(:first-child) {
   max-width: 40px;
 }
 
+body.light-theme td:hover {
+  background-color: #f1f1f1;
+}
+
+body.dark-theme td:hover {
+  background-color: #3b3b47;
+}
+
+/* ===================== NUMBERS COLORS ====================== */
 .zero-number {
-  color: #999999; /* Jasnoszary dla liczby 0 */
+  color: var(--zero-number);
   font-weight: bold;
 }
 
 .green-number {
-  color: #81c784; /* zielony */
+  color: var(--green-number);
   font-weight: bold;
 }
 
 .orange-number {
-  color: #ffb74d; /* pomarańczowy */
+  color: var(--orange-number);
   font-weight: bold;
 }
 
 .red-number {
-  color: #e57373; /* czerwony */
+  color: var(--red-number);
   font-weight: bold;
 }
 
@@ -82,45 +168,47 @@ th:not(:first-child), td:not(:first-child) {
 
 @keyframes blink {
   0% { color: #ffcccc; }
-  50% { color: red; color: rgb(243, 0, 0); }
+  50% { color: red; }
   100% { color: #ffcccc; }
 }
 
+/* ===================== BUTTONS ====================== */
 #settingsBtn {
-  background-color: #2c2c34;
-  color: white;
+  background-color: var(--primary-btn);
+  color: var(--text-color);
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-/* Tło dla całego modala */
+#settingsBtn:hover {
+  background-color: var(--hover-btn);
+}
+
+/* ===================== MODAL ====================== */
 .modal {
-  display: none; /* Domyślnie ukryty */
+  display: none;
   position: fixed;
   z-index: 1000;
-  left: 0;
-  top: 0;
+  left: 0; top: 0;
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.7); /* Półprzezroczyste czarne tło */
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Treść modala */
 .modal-content {
-  background-color: #2c2b32;
+  background-color: var(--modal-bg);
   margin: 10% auto;
   padding: 20px;
-  border: 1px solid #888;
+  border: 1px solid var(--modal-border);
   width: 80%;
   max-width: 600px;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Przyciski zamykające */
 .close {
   color: #aaa;
   float: right;
@@ -135,58 +223,38 @@ th:not(:first-child), td:not(:first-child) {
   cursor: pointer;
 }
 
-.back-button {
-  display: inline-block;
-  margin: 20px 0;
-  padding: 10px 20px;
-  background-color: #2c2c34;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 8px;
-  border: 1px solid #444;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.back-button:hover {
-  background-color: #3b3b47;
-  transform: scale(1.05);
-}
-
-/* Stylowanie przycisków i selektorów wewnątrz modala */
+/* ===================== INPUTS & SELECTS ====================== */
 .modal-content button,
 .modal-content select {
-  background-color: #4a4752;
-  color: #fff;
-  border: none;
+  background-color: var(--primary-btn);
+  color: var(--text-color);
+  border: 1px solid var(--td-border);
   padding: 10px 14px;
   margin-top: 10px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .modal-content button:hover,
 .modal-content select:hover {
-  background-color: #5c5963;
+  background-color: var(--hover-btn);
 }
-
-/* Upload */
 
 .custom-file-upload {
   display: inline-block;
   padding: 10px 20px;
-  background-color: #2c2c34;
-  color: #fff;
+  background-color: var(--primary-btn);
+  color: var(--text-color);
   cursor: pointer;
   border-radius: 8px;
-  border: 1px solid #444;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s;
+  border: 1px solid var(--td-border);
+  transition: background-color 0.3s;
 }
 
 .custom-file-upload:hover {
-  background-color: #3b3b47;
-  transform: scale(1.05);
+  background-color: var(--hover-btn);
 }
 
 .custom-file-upload input[type="file"] {
@@ -195,38 +263,112 @@ th:not(:first-child), td:not(:first-child) {
 
 #file-name {
   margin-left: 15px;
-  color: #ccc;
-  display: inline-block;
+  color: var(--text-color);
 }
 
 .delete-btn {
   padding: 10px 20px;
   background-color: #d9534f;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.3s;
 }
 
 .delete-btn:hover {
   background-color: #c9302c;
-  transform: scale(1.05);
 }
 
 .select-custom {
   padding: 10px;
-  background-color: #2c2c34;
-  color: #fff;
-  border: 1px solid #444;
+  background-color: var(--primary-btn);
+  color: var(--text-color);
+  border: 1px solid var(--td-border);
   border-radius: 8px;
 }
 
-/* EGZ Cell */
+/* ===================== SWITCH ====================== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
 
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+body.light-theme .switch input:checked + .slider {
+  background-color: #28a745;
+}
+
+span {
+  cursor: pointer;
+}
+
+/* ===================== BACK BUTTON ====================== */
+.back-button {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 10px 20px;
+  background-color: var(--primary-btn);
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.back-button:hover {
+  background-color: var(--hover-btn);
+}
+
+/* ===================== OTHER ====================== */
 .egz-cell {
-  color: #ff4c4c; /* mocno czerwony */
+  color: var(--egz-color);
   font-weight: bold;
   text-transform: uppercase;
+}
+
+.yellow-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: gold;
+  border-radius: 50%;
+  margin-left: 5px;
 }

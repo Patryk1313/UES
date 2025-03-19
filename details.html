@@ -38,6 +38,16 @@
     html += '</tbody></table>';
     document.getElementById('details').innerHTML = html;
   }
+
+  // Pobierz tryb zapisany w localStorage
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.body.classList.add(savedTheme + '-theme');
+  } else {
+    // domyślnie dark
+    document.body.classList.add('dark-theme');
+  }
+
 </script>
 
 </body>
