@@ -406,16 +406,3 @@ span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-@media (max-width: 600px) {
-.styled-table th:first-child, 
-.styled-table td:first-child {
-  width: 30px;
-  max-width: 30px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
-  font-weight: 600;
-}
-}
