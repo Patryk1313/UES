@@ -384,39 +384,6 @@ span {
   }
 }
 
-/* Modal i przyciski dopasowane na telefonie */
-@media (max-width: 600px) {
-  .modal-content {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .custom-file-upload,
-  .modal-content button,
-  .modal-content select,
-  .delete-btn {
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  #settingsBtn {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    padding: 10px 12px;
-    z-index: 999;
-  }
-
-  th, td {
-    padding: 8px 4px;
-    font-size: 12px;
-  }
-
-  h1 {
-    font-size: 20px;
-  }
-}
-
 /* Ograniczenie szerokości kolumny 'blok' */
 .styled-table th:first-child, 
 .styled-table td:first-child {
@@ -436,4 +403,9 @@ span {
     max-width: 60px;
     font-size: 12px;
   }
+
+  th:first-child, td:first-child {
+    font-size: 8px;
+  }
+
 }
