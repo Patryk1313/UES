@@ -1,11 +1,12 @@
 let globalData = {};
 let fullDetails = [];
 let sortedDays = [];
+let dayHours = {}; // <- Dodaj globalnie!
 
 function formatDate(dateStr) {
   if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
     const parts = dateStr.split('-');
-    return `${parts[2]}.${parts[1]}`; // 01.04
+    return `${parts[2]}.${parts[1]}`; 
   } else if (dateStr instanceof Date) {
     const day = ('0' + dateStr.getDate()).slice(-2);
     const month = ('0' + (dateStr.getMonth() + 1)).slice(-2);
@@ -23,7 +24,7 @@ function isFutureOrToday(dateStr) {
   return inputDate >= now;
 }
 
-function renderTable(limit = 3, dayHours = {}) {
+function renderTable(limit = 3) {
   let days = [...sortedDays];
   if (limit !== 'all') days = days.slice(0, limit);
 
@@ -71,7 +72,7 @@ function renderTable(limit = 3, dayHours = {}) {
   });
   html += '</tr>';
 
-  // Dodanie godzin rozpoczęcia i zakończenia
+  // Godziny
   html += '<tr><th>Godziny</th>';
   days.forEach(day => {
     const godziny = dayHours[day] ? `${dayHours[day].start} - ${dayHours[day].end}` : '';
@@ -97,28 +98,28 @@ function showDayDetails(day) {
 
 function processExcel(json) {
   globalData = {};
-  let daySet = new Set();
-  let dayHours = {}; // Zbieramy godziny rozpoczęcia i zakończenia
+  let daySet = {};
+  dayHours = {}; // RESET przy nowym pliku
 
   json.forEach(row => {
     const subject = row['przedmiot'];
     let day = row['dzień'];
     if (!subject || !day) return;
-    
+
     day = formatDate(day);
-    
+
     if (!isFutureOrToday(day)) return;
     if (!globalData[subject]) globalData[subject] = {};
     if (!globalData[subject][day]) globalData[subject][day] = 0;
     globalData[subject][day] += 1;
-    daySet.add(day);
+    daySet[day] = true;
     row['dzień'] = day;
 
     // Godziny
     if (row['blok']) {
       const blok = row['blok'];
       const [start, end] = blok.split('-').map(t => t.trim());
-      
+
       if (!dayHours[day]) {
         dayHours[day] = { start, end };
       } else {
@@ -128,13 +129,13 @@ function processExcel(json) {
     }
   });
 
-  sortedDays = Array.from(daySet).sort((a,b)=>{
+  sortedDays = Object.keys(daySet).sort((a, b) => {
     const [ad, am] = a.split(/[-.]/).map(Number);
     const [bd, bm] = b.split(/[-.]/).map(Number);
-    return new Date(0, am-1, ad) - new Date(0, bm-1, bd);
+    return new Date(0, am - 1, ad) - new Date(0, bm - 1, bd);
   });
 
-  renderTable(3, dayHours);
+  renderTable(3);
 }
 
 function clearData() {
@@ -167,9 +168,9 @@ window.onload = () => {
 };
 
 const daysSelect = document.getElementById('daysSelect');
-daysSelect.addEventListener('change', function() {
+daysSelect.addEventListener('change', function () {
   const value = this.value === 'all' ? 'all' : parseInt(this.value);
-  processExcel(fullDetails, value);
+  renderTable(value); // <- Poprawka TU!
 });
 
 // Modal settings
