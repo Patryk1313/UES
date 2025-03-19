@@ -397,15 +397,7 @@ span {
 }
 
 @media (max-width: 600px) {
-  .styled-table th:first-child, 
-  .styled-table td:first-child {
-    width: 60px;
-    max-width: 60px;
-    font-size: 12px;
-  }
-
   th:first-child, td:first-child {
     font-size: 8px;
   }
-
 }
